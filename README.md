@@ -239,10 +239,6 @@ public class CustomMapHandler : MapHandler
 }
 ~~~
 
-Con todo lo anterior, el código en iOS sería el siguiente:
-
-Siendo en Android el que a continuación se detalla:
-
 Por último, es necesario indicarle al *builder* el *handler* que se va a utilizar para renderizar un mapa, así cómo modificar el *mapper* de los pins. Para ello, se añaden las siguientes líneas en el método *CreateMauiApp* del *MauiProgram*
 
 ~~~
