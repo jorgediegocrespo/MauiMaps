@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="MauiMaps.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:maps="clr-namespace:Microsoft.Maui.Maps;assembly=Microsoft.Maui.Maps"
+    xmlns:mapsControls="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
+    xmlns:sensors="clr-namespace:Microsoft.Maui.Devices.Sensors;assembly=Microsoft.Maui.Essentials"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Grid RowDefinitions="*, 50, 50">
+        <mapsControls:Map x:Name="map">
+            <x:Arguments>
+                <maps:MapSpan>
+                    <x:Arguments>
+                        <sensors:Location>
+                            <x:Arguments>
+                                <x:Double>39.158260</x:Double>
+                                <x:Double>-3.021232</x:Double>
+                            </x:Arguments>
+                        </sensors:Location>
+                        <x:Double>0.01</x:Double>
+                        <x:Double>0.01</x:Double>
+                    </x:Arguments>
+                </maps:MapSpan>
+            </x:Arguments>
+        </mapsControls:Map>
+
+        <HorizontalStackLayout
+            Grid.Row="1"
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
+
+            <Button x:Name="btChangeUser" Clicked="ChangeUser_OnClicked" Text="User On" />
+            <Button x:Name="btChangeScroll" Clicked="ChangeScroll_OnClicked" Text="Scroll On" />
+            <Button x:Name="btChangeTraffic" Clicked="ChangeTraffic_OnClicked" Text="Traffic On" />
+            <Button Clicked="ChangeMapType_OnClicked" Text="Map type" />
+        </HorizontalStackLayout>
+
+        <HorizontalStackLayout
+            Grid.Row="2"
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
+
+            <Button Clicked="SpanButton_OnClicked" Text="Span" />
+            <Button Clicked="ZoomInButton_OnClicked" Text="+" />
+            <Button Clicked="ZoomOutButton_OnClicked" Text="-" />
+            <Button x:Name="btChangeZoom" Clicked="ChangeZoom_OnClicked" Text="Zoom On" />
+            <Button Clicked="CreatePins_OnClicked" Text="Pins" />
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>
