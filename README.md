@@ -1,7 +1,7 @@
 # dotNet MAUI Maps
-Una de las novedades que se ha lanzado ultimamente en *dotNet MAUI* es la posibilidad de utilizar mapas. Por lo que estos días he estado jugando un poco con todas las posibilidades que nos ofrecen estos mapas.
+Una de las novedades que se ha lanzado ultimamente en *dotNet MAUI* es la posibilidad de utilizar mapas. Por lo que estos días he estado jugando un poco con todas las posibilidades que nos ofrecen éstos.
 
-## Preconfiguración par autilizar mapas
+## Preconfiguración para utilizar mapas
 Para poder utilizar mapas en nuestra aplicación, es necesario hacer algunas acciones previas que detallo a continuación:
 - Instalar el nuget *Microsoft.Maui.Controls.Maps*
 - Ejecutar, desde el método *CreateMauiApp* de la clase *MauiProgram*, *builder.UseMauiMaps*
@@ -16,12 +16,12 @@ public static MauiApp CreateMauiApp()
     return builder.Build();
 }
 ~~~
-- En iOS, modificar el archivo *info.plist* para informar al usuario que se va a utilizar su localización
+- En iOS, modificar el archivo *info.plist* para informar al usuario de que se va a utilizar su localización
 ~~~
-<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-<string>Can we use your location at all times?</string>
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>Can we use your location when your app is being used?</string>
+NSLocationAlwaysAndWhenInUseUsageDescription
+Can we use your location at all times?
+NSLocationWhenInUseUsageDescription
+Can we use your location when your app is being used?
 ~~~
 - En Android, es necesario modificar el archivo *AndroidManifest.xml* para incluir nuestro *API key* de *Google Maps* (en esta web se indica cómo obtenerlo https://developers.google.com/maps/documentation/android-sdk/get-api-key) y permisos.
 ~~~
@@ -74,6 +74,7 @@ private void ZoomOutButton_OnClicked(object sender, EventArgs e)
 
 ## Pins personalizados
 Con las propiedades que nos ofrecen los mapas, no tenemos opciones de personalizar el pin de un mapa con una imagen alternativa. No obstante, podemos conseguirlo de una forma sencilla modificando el método utilizado para mapear los pins a los controles nativos. 
+
 El primer paso, es ampliar las propiedades de un pin, para poder especificar una imagen, tal y como se muestra a continuación:
 
 ~~~
@@ -83,15 +84,19 @@ public class CustomPin : Pin
 
     public ImageSource ImageSource
     {
-        get => (ImageSource)GetValue(ImageSourceProperty);
-        set => SetValue(ImageSourceProperty, value);
+        get =&gt; (ImageSource)GetValue(ImageSourceProperty);
+        set =&gt; SetValue(ImageSourceProperty, value);
     }
 }
 ~~~
 
-El siguiente paso sería modificar el mapeo de estos pines para cada una de las plataformas, iOS y Android en el ejemplo que nos ocupa. Además, en ambas plataformas es necesario sobreescribir el *handler* pora poder añadir cierta funcionalidad periférica al mapeo de estos pines. 
+El siguiente paso sería modificar el mapeo de estos pines para cada una de las plataformas. iOS y Android en el ejemplo que nos ocupa. Además, en ambas plataformas es necesario sobreescribir el *handler* pora poder añadir cierta funcionalidad periférica al mapeo de estos pines. 
 
 En iOS se sobreescribe para modificar el método que retorna la *View* para las *Annotations* del mapa. 
+
+En Android, se hace para tener una referencia a los *Markers* del mapa, ya que está referencia no es accesible en un *MapHandler*.
+
+Con todo lo anterior, el código en iOS sería el siguiente:
 
 ~~~
 public class CustomAnnotation : MKPointAnnotation
@@ -117,7 +122,7 @@ public class CustomMapHandler : MapHandler
         if (handler?.MauiContext == null)
             return;
 
-        if (mauiMKMapView.Annotations?.Length > 0)
+        if (mauiMKMapView.Annotations?.Length &gt; 0)
             mauiMKMapView.RemoveAnnotations(mauiMKMapView.Annotations);
 
         foreach (Microsoft.Maui.Maps.IMapPin pin in pins)
@@ -132,7 +137,7 @@ public class CustomMapHandler : MapHandler
                 continue;
             }
 
-            cp.ImageSource.LoadImage(handler.MauiContext, result =>
+            cp.ImageSource.LoadImage(handler.MauiContext, result =&gt;
             {
                 var markerOption = new CustomAnnotation()
                 {
@@ -173,12 +178,12 @@ public class CustomMapHandler : MapHandler
 }
 ~~~
 
-En Android, se hace para tener una refencia a los *Markers* del mapa, ya que está refencia no es accesible en un *MapHandler*.
+Siendo en Android el que a continuación se detalla:
 
 ~~~
 public class CustomMapHandler : MapHandler
 {
-    private List<Marker>? _markers;
+    private List? _markers;
 
     public static void CustomMapPins(IMapHandler handler, IMap map)
     {
@@ -200,13 +205,13 @@ public class CustomMapHandler : MapHandler
 
     }
 
-    private void AddPins(IEnumerable<IMapPin> mapPins)
+    private void AddPins(IEnumerable mapPins)
     {
         if (Map is null || MauiContext is null)
             return;
 
 
-        _markers ??= new List<Marker>();
+        _markers ??= new List();
         foreach (var pin in mapPins)
         {
             var pinHandler = pin.ToHandler(MauiContext);
@@ -220,7 +225,7 @@ public class CustomMapHandler : MapHandler
                 continue;
             }
 
-            cp.ImageSource.LoadImage(MauiContext, result =>
+            cp.ImageSource.LoadImage(MauiContext, result =&gt;
             {
                 if (result?.Value is BitmapDrawable bitmapDrawable)
                     markerOption.SetIcon(BitmapDescriptorFactory.FromBitmap(bitmapDrawable.Bitmap));
@@ -230,7 +235,7 @@ public class CustomMapHandler : MapHandler
         }
     }
 
-    private void AddMarker(GoogleMap map, IMapPin pin, List<Marker> markers, MarkerOptions markerOption)
+    private void AddMarker(GoogleMap map, IMapPin pin, List markers, MarkerOptions markerOption)
     {
         var marker = map.AddMarker(markerOption);
         pin.MarkerId = marker.Id;
@@ -239,23 +244,24 @@ public class CustomMapHandler : MapHandler
 }
 ~~~
 
+
 Por último, es necesario indicarle al *builder* el *handler* que se va a utilizar para renderizar un mapa, así cómo modificar el *mapper* de los pins. Para ello, se añaden las siguientes líneas en el método *CreateMauiApp* del *MauiProgram*
 
 ~~~
 builder
-  .UseMauiApp<App>()
+  .UseMauiApp()
   ...
-  .ConfigureMauiHandlers(handlers =>
+  .ConfigureMauiHandlers(handlers =&gt;
   {
   #if IOS || MACCATALYST
-    handlers.AddHandler<Microsoft.Maui.Controls.Maps.Map, CustomMapHandler>();
-    Microsoft.Maui.Maps.Handlers.MapHandler.Mapper.ModifyMapping(nameof(Microsoft.Maui.Maps.IMap.Pins), (handler, view, action) =>
+    handlers.AddHandler();
+    Microsoft.Maui.Maps.Handlers.MapHandler.Mapper.ModifyMapping(nameof(Microsoft.Maui.Maps.IMap.Pins), (handler, view, action) =&gt;
       CustomMapHandler.CustomMapPins(handler, view));
   #elif ANDROID
-    handlers.AddHandler<Microsoft.Maui.Controls.Maps.Map, CustomMapHandler>();
-    Microsoft.Maui.Maps.Handlers.MapHandler.Mapper.ModifyMapping(nameof(Microsoft.Maui.Maps.IMap.Pins), (handler, view, action) =>
+    handlers.AddHandler();
+    Microsoft.Maui.Maps.Handlers.MapHandler.Mapper.ModifyMapping(nameof(Microsoft.Maui.Maps.IMap.Pins), (handler, view, action) =&gt;
       CustomMapHandler.CustomMapPins(handler, view));
 
-    handlers.AddHandler<Microsoft.Maui.Controls.Maps.Map, CustomMapHandler>();
+    handlers.AddHandler();
 #endif
 ~~~
